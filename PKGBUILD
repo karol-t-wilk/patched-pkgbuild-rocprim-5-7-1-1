@@ -7,12 +7,20 @@ pkgdesc='Header-only library providing HIP parallel primitives'
 arch=('x86_64')
 url='https://codedocs.xyz/ROCmSoftwarePlatform/rocPRIM'
 _git='https://github.com/ROCmSoftwarePlatform/rocPRIM'
+_patchhash='ab4070ad08cc2ab10bdfdbd54efe6c42d8003f6d'
+_patch="https://github.com/karol-t-wilk/rocm-gfx10xx-patch/commit/${_patchhash}.patch"
 license=('MIT')
 depends=('hip')
 makedepends=('rocm-cmake')
-source=("$pkgname-$pkgver.tar.gz::$_git/archive/rocm-$pkgver.tar.gz")
-sha256sums=('15d820a0f61aed60efbba88b6efe6942878b02d912f523f9cf8f33a4583d6cd7')
+source=("$_git/archive/rocm-$pkgver.tar.gz"
+"$_patch")
+sha256sums=('15d820a0f61aed60efbba88b6efe6942878b02d912f523f9cf8f33a4583d6cd7' 'SKIP')
 _dirname="$(basename "$_git")-$(basename "${source[0]}" ".tar.gz")"
+
+prepare() {
+	# apply DPP patch
+	patch -d "$_dirname" -p1 -i "../${_patchhash}.patch"
+}
 
 build() {
   # -fcf-protection is not supported by HIP, see
